@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>浏览器 VS WASM 测试04</title>
+  <style>
+      h1 {
+          color: green;
+          text-align: center; 
+          font-weight: bold;
+      }
+  </style>
+</head>
+<body>
+    
+    <h1 id="header">
+        
+    </h1>
+<script>
+ 
+    function addHTML() {
+        const result = addWasm(8, 6);
+    
+        document.getElementById('header').innerHTML = `8 加 6 等于 ${result}`;
+    }
+    
+    let addWasm;
+        
+    async function getFuncInWasm() {
+      if( !WebAssembly.instantiateStreaming ) {
+          const response = await fetch( 'test.wasm' );
+          const bytes = await response.arrayBuffer();
+          const result = await WebAssembly.instantiate( bytes );
+          addWasm = result.instance.exports.add;
+          addHTML();
+      } else {
+         const response = fetch( 'test.wasm' );
+         const { instance } = await WebAssembly.instantiateStreaming( response );
+         addWasm = instance.exports.add;
+         addHTML();  
+      } 
+    } 
+    
+getFuncInWasm();
+</script>
+</body>
+</html>
